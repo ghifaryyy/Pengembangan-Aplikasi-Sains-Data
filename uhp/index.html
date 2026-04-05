@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UMKM Health Predictor | UHP Dashboard</title>
+  <meta name="description" content="Prediksi kesehatan bisnis UMKM menggunakan AI — analisis finansial, sentimen pelanggan, dan klasifikasi status bisnis secara real-time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="index.css?v=2" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">UHP</span>
+        <span class="brand-sub">UMKM Health Predictor</span>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" id="navPredict" onclick="switchTab('predict')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Analisis
+      </button>
+      <button class="nav-btn" id="navData" onclick="switchTab('data')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Data Explorer
+      </button>
+    </nav>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span id="dataStatus">Memuat data...</span>
+    </div>
+  </header>
+
+  <!-- Main App -->
+  <main class="app-main">
+    <!-- ====== TAB: PREDICT ====== -->
+    <section class="tab-panel active" id="tabPredict">
+      <!-- LEFT SIDEBAR: Input Panel -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2 class="sidebar-title">Input Data UMKM</h2>
+          <p class="sidebar-desc">Masukkan data operasional bisnis untuk analisis kesehatan</p>
+        </div>
+
+        <div class="input-section">
+          <div class="section-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Finansial
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputRevenue">Pendapatan Bulanan (IDR)</label>
+            <div class="input-wrapper currency">
+              <span class="input-prefix">Rp</span>
+              <input type="number" id="inputRevenue" class="form-input" placeholder="10.000.000" min="0" step="100000" value="8000000" />
+            </div>
+            <span class="input-hint">Omzet kotor per bulan</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputExpenses">Biaya Operasional (IDR)</label>
+            <div class="input-wrapper currency">
+              <span class="input-prefix">Rp</span>
+              <input type="number" id="inputExpenses" class="form-input" placeholder="6.000.000" min="0" step="100000" value="7200000" />
+            </div>
+            <span class="input-hint">Pengeluaran total per bulan</span>
+          </div>
+        </div>
+
+        <div class="input-section">
+          <div class="section-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Operasional
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputTransactions">
+              Jumlah Transaksi / Bulan
+              <span class="slider-value" id="transactionVal">120</span>
+            </label>
+            <input type="range" id="inputTransactions" class="form-slider" min="10" max="300" step="5" value="120" oninput="updateSlider('transaction')" />
+            <div class="slider-range"><span>10</span><span>300</span></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputTenure">
+              Durasi Usaha (Bulan)
+              <span class="slider-value" id="tenureVal">36</span>
+            </label>
+            <input type="range" id="inputTenure" class="form-slider" min="1" max="200" step="1" value="36" oninput="updateSlider('tenure')" />
+            <div class="slider-range"><span>1 bln</span><span>200 bln</span></div>
+          </div>
+        </div>
+
+        <div class="input-section">
+          <div class="section-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Ulasan Pelanggan
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inputReview">Teks Ulasan Pelanggan</label>
+            <textarea id="inputReview" class="form-textarea" rows="4" placeholder="Contoh: Pelayanan cepat dan ramah, pesanan selalu tepat. Kualitas produk konsisten dan harga masih masuk akal...">Pelayanan cepat dan ramah, pesanan selalu tepat. Aplikasi pemesanan mudah dipakai dan responsif.</textarea>
+            <div class="review-meter">
+              <div class="meter-label">Pra-analisis sentimen:</div>
+              <div class="meter-bar">
+                <div class="meter-fill" id="sentimentMeter"></div>
+              </div>
+              <span class="meter-score" id="sentimentPreview">+</span>
+            </div>
+          </div>
+        </div>
+
+        </aside>
+
+      <!-- RIGHT MAIN PANEL: Results Dashboard -->
+      <div class="main-panel">
+        <!-- Empty state / Welcome -->
+        <div class="welcome-state" id="welcomeState">
+          <div class="welcome-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          </div>
+          <h3>Siap untuk Analisis</h3>
+          <p>Masukkan data UMKM di panel kiri dan klik "Analisis Kesehatan Bisnis" untuk mendapatkan prediksi status bisnis, skor sentimen, dan rekomendasi strategis.</p>
+          <div class="welcome-stats" id="welcomeStats">
+            <div class="ws-card"><span class="ws-num" id="wsTotal">—</span><span class="ws-label">Data UMKM</span></div>
+            <div class="ws-card"><span class="ws-num elite-color" id="wsElite">—</span><span class="ws-label">Elite</span></div>
+            <div class="ws-card"><span class="ws-num growth-color" id="wsGrowth">—</span><span class="ws-label">Growth</span></div>
+            <div class="ws-card"><span class="ws-num struggling-color" id="wsStruggling">—</span><span class="ws-label">Struggling</span></div>
+            <div class="ws-card"><span class="ws-num critical-color" id="wsCritical">—</span><span class="ws-label">Critical</span></div>
+          </div>
+        </div>
+
+        <!-- Results (hidden until analysis) -->
+        <div class="results-panel" id="resultsPanel" style="display:none;">
+
+          <!-- Row 1: Metric Cards -->
+          <div class="metrics-row">
+            <div class="metric-card" id="cardNetProfit">
+              <div class="metric-icon profit-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div class="metric-body">
+                <span class="metric-label">Net Profit</span>
+                <span class="metric-value" id="metricNetProfit">Rp 0</span>
+                <span class="metric-sub" id="metricNPM">Margin: 0%</span>
+              </div>
+              <div class="metric-trend" id="trendNetProfit"></div>
+            </div>
+
+            <div class="metric-card" id="cardSentiment">
+              <div class="metric-icon sentiment-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+              </div>
+              <div class="metric-body">
+                <span class="metric-label">Sentiment Score</span>
+                <span class="metric-value" id="metricSentiment">0.00</span>
+                <span class="metric-sub" id="metricSentimentLabel">Netral</span>
+              </div>
+              <div class="sentiment-gauge-mini" id="sentimentGauge"></div>
+            </div>
+
+            <div class="metric-card" id="cardBurnRate">
+              <div class="metric-icon burn-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+              </div>
+              <div class="metric-body">
+                <span class="metric-label">Burn Rate Ratio</span>
+                <span class="metric-value" id="metricBurnRate">0.00</span>
+                <span class="metric-sub" id="metricBurnLabel">—</span>
+              </div>
+              <div class="metric-bar-mini">
+                <div class="metric-bar-fill" id="burnRateBar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Health Badge -->
+          <div class="health-section">
+            <div class="health-badge-card">
+              <div class="badge-left">
+                <div class="badge-label">Status Kesehatan Bisnis</div>
+                <div class="health-badge" id="healthBadge">
+                  <span class="badge-status-text" id="badgeText">—</span>
+                </div>
+                <div class="badge-desc" id="badgeDesc">—</div>
+                <div class="badge-model-tag">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Random Forest + XGBoost Ensemble
+                </div>
+              </div>
+              <div class="badge-right">
+                <div class="confidence-ring-container">
+                  <svg class="confidence-svg" viewBox="0 0 120 120" width="120" height="120">
+                    <circle class="ring-track" cx="60" cy="60" r="50" />
+                    <circle class="ring-fill" id="confidenceRing" cx="60" cy="60" r="50"
+                      stroke-dasharray="314" stroke-dashoffset="314" />
+                  </svg>
+                  <div class="confidence-center">
+                    <span class="conf-pct" id="confidencePct">0%</span>
+                    <span class="conf-label">Confidence</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Feature Importance + Insights -->
+          <div class="bottom-row">
+            <!-- Feature Importance Chart -->
+            <div class="chart-card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  Feature Importance
+                </div>
+                <span class="card-subtitle">Faktor dominan prediksi</span>
+              </div>
+              <div class="chart-body" id="featureChart"></div>
+            </div>
+
+            <!-- Actionable Insights -->
+            <div class="insights-card" id="insightsCard">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Insight & Rekomendasi
+                </div>
+              </div>
+              <div class="insight-body">
+                <div class="insight-icon-big" id="insightIconBig"></div>
+                <p class="insight-text" id="insightText">—</p>
+                <div class="insight-actions" id="insightActions"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== FLOATING ACTION CARD ====== -->
+    <div class="floating-action-card" id="floatingAction">
+      <div class="fac-quick">
+        <span class="fac-label">Contoh cepat:</span>
+        <button onclick="quickFill('elite')" class="quick-btn elite">Elite</button>
+        <button onclick="quickFill('growth')" class="quick-btn growth">Growth</button>
+        <button onclick="quickFill('struggling')" class="quick-btn struggling">Struggling</button>
+        <button onclick="quickFill('critical')" class="quick-btn critical">Critical</button>
+      </div>
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyzeUMKM()">
+        <span class="btn-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </span>
+        <span class="btn-text">Analisis Kesehatan Bisnis</span>
+        <div class="btn-loader" id="btnLoader"></div>
+      </button>
+    </div>
+
+    <section class="tab-panel" id="tabData">
+      <div class="explorer-layout">
+        <!-- Summary Cards -->
+        <div class="explorer-header">
+          <h2 class="explorer-title">Data Explorer</h2>
+          <p class="explorer-desc">Dataset UMKM sintetis — 150.000 entri bisnis</p>
+
+          <div class="explorer-stats">
+            <div class="exp-stat-card elite-border">
+              <div class="exp-stat-num elite-color" id="expElite">—</div>
+              <div class="exp-stat-label">Elite</div>
+              <div class="exp-stat-bar"><div class="exp-bar-fill elite-bg" id="expEliteBar"></div></div>
+            </div>
+            <div class="exp-stat-card growth-border">
+              <div class="exp-stat-num growth-color" id="expGrowth">—</div>
+              <div class="exp-stat-label">Growth</div>
+              <div class="exp-bar-fill growth-bg" id="expGrowthBar" style="height:4px;border-radius:2px;width:0%;margin-top:6px;"></div>
+            </div>
+            <div class="exp-stat-card struggling-border">
+              <div class="exp-stat-num struggling-color" id="expStruggling">—</div>
+              <div class="exp-stat-label">Struggling</div>
+              <div class="exp-bar-fill struggling-bg" id="expStrugglingBar" style="height:4px;border-radius:2px;width:0%;margin-top:6px;"></div>
+            </div>
+            <div class="exp-stat-card critical-border">
+              <div class="exp-stat-num critical-color" id="expCritical">—</div>
+              <div class="exp-stat-label">Critical</div>
+              <div class="exp-bar-fill critical-bg" id="expCriticalBar" style="height:4px;border-radius:2px;width:0%;margin-top:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="search-wrapper">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Cari ulasan, kelas..." oninput="filterData()" />
+          </div>
+          <select class="filter-select" id="classFilter" onchange="filterData()">
+            <option value="">Semua Kelas</option>
+            <option value="Elite">Elite</option>
+            <option value="Growth">Growth</option>
+            <option value="Struggling">Struggling</option>
+            <option value="Critical">Critical</option>
+          </select>
+          <span class="filter-count" id="filterCount">—</span>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-wrapper">
+          <table class="data-table" id="dataTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Revenue</th>
+                <th>NPM %</th>
+                <th>Burn Rate</th>
+                <th>Transaksi</th>
+                <th>Rating</th>
+                <th>Sentimen</th>
+                <th>Kelas</th>
+                <th>Ulasan</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="9" class="table-loading">Memuat data CSV...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+          <button class="page-btn" id="prevBtn" onclick="changePage(-1)">← Sebelumnya</button>
+          <span class="page-info" id="pageInfo">Halaman 1</span>
+          <button class="page-btn" id="nextBtn" onclick="changePage(1)">Berikutnya →</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js?v=2"></script>
+</body>
+</html>
